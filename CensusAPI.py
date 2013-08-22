@@ -57,7 +57,8 @@ dobg = False #Do you want to run the block group, if not run tract
 
 #open output
 try:
-    ofile = csv.writer(open(outfile,'w'),lineterminator='\n')
+    ofile = open(outfile,'w')
+    csvwriter = csv.writer(ofile,lineterminator='\n')
 except:
     raise Exception('Unable to open csv for writing.')
 
@@ -126,13 +127,17 @@ try:
                         bgs.append(bg) # create a list of the JSON items for each block group.
     if bgs != []:
         # write bgs
-        ofile.writerow(bgkey)
-        ofile.writerows(bgs)
+        csvwriter.writerow(bgkey)
+        csvwriter.writerows(bgs)
         
     else:
         # write tracts
-        ofile.writerow(tractkey)
-        ofile.writerows(tracts)
+        csvwriter.writerow(tractkey)
+        csvwriter.writerows(tracts)
+    try:
+        ofile.close()
+    except:
+        raise Exception("Failed to close output csv.")
     
     
     
