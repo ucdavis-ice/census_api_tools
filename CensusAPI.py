@@ -104,7 +104,7 @@ try:
     statelist = json.load(stateresult)
     stateidx = get_val(statelist[0],"state")
     for state in statelist[1:]:
-        countiesurl = baseurls[source].format(ikey=key)+"&get=NAME&for=county:113&in=state:{istate}".format(ikey=key,istate=state[stateidx])
+        countiesurl = baseurls[source].format(ikey=key)+"&get=NAME&for=county:*&in=state:{istate}".format(ikey=key,istate=state[stateidx])
         cntyresult = urllib2.urlopen(countiesurl)
         countylist = json.load(cntyresult)
         cntyidx = get_val(countylist[0],'county')

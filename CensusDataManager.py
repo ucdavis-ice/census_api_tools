@@ -88,6 +88,14 @@ class GetVals(object):
    
     def GetState(self,extent,fields):
         return json.load(urllib2.urlopen("&".join([self.sourceurls[self.source],self.sumlevelurls['state'].format(istate=",".join(extent)),'get='+",".join(fields+['NAME'])])))
+    
+    def GetCounty(self,extent,fields):
+        counties = []
+        statelist = json.load(urllib2.urlopen("&".join([self.sourceurls[self.source],self.sumlevelurls['state'].format(istate=",".join(extent))])))
+        for state in statelist[1:]:
+            countieslist = json.load(urllib2.urlopen("&".join([self.sourceurls[self.source],self.sumlevelurls['county'].format(istate=state[-1], icounty="*"),'get='+",".join(fields+['NAME'])])))
+            
+    
 
 
 #metadata
