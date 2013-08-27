@@ -32,17 +32,71 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys,urllib2,json,datetime,time,api_key,csv
 
-
-class Setup(object):
-    '''
     
-    '''
-    def __init__(self,connstr,source,extent,level):
-        self.connstr = connstr
-        self.source = source
+    
+    
+
+
+class GetVals(object):
+    
+    def __init__(self,source, fields, extent, sumlevel):
+        
+        self.sumlevels = ['state','county','place','tract','bg','block']
+        self.sumlevelurls = {}
+        self.sumlevelurls['state'] = "for=state:{istate}"
+        self.sumlevelurls['county'] = "for=county:{icounty}&in=state:{istate}"
+        self.sumlevelurls['place'] = "for=place:{iplace}&in=state:{istate}"
+        self.sumlevelurls['tract'] = "for=tract:{itract}&in=state:{istate}+county:{icounty}"
+        self.sumlevelurls['bg'] = "for=block+group:{ibg}&in=state:{istate}+county:{icounty}+tract:{itract}"
+        self.sumlevelurls['block'] = "for=block:{iblock}&in=state:{istate}+county:{icounty}+tract:{itract}"
+        
+        self.sources = ['sf1_2010','sf1_2000','sf3_2000','sf1_1990','sf3_1990','acs_2010_5','acs_2011_5']
+        self.sourceurls ={}
+        self.sourceurls['sf1_2010'] = "http://api.census.gov/data/2010/sf1?key={ikey}"
+        self.sourceurls['sf1_2000'] = "http://api.census.gov/data/2000/sf1?key={ikey}"
+        self.sourceurls['sf3_2000'] = "http://api.census.gov/data/2000/sf3?key={ikey}"
+        self.sourceurls['sf1_1990'] = "http://api.census.gov/data/1990/sf1?key={ikey}"
+        self.sourceurls['sf3_1990'] = "http://api.census.gov/data/1990/sf3?key={ikey}"
+        self.sourceurls['acs_2010_5'] = "http://api.census.gov/data/2010/acs5?key={ikey}"
+        self.sourceurls['acs_2011_5'] = "http://api.census.gov/data/2011/acs5?key={ikey}"
+        
+        
+        if self.CheckSource(source):
+            self.source = source
+        else:
+            raise Exception("Failed to register source")
+        self.fields = fields
         self.extent = extent
-        self.level = level
+        if self.CheckSumLevel(sumlevel): 
+            self.sumlevel = sumlevel
+        else:
+            raise Exception("Failed to register summary level")
+
         
+    def CheckSumLevel(self,sumlevel):
+        if sumlevel in self.sumlevels:
+            return True
+        else:
+            return False
+    
+    def CheckSource(self,source):
+        if source in self.sources:
+            return True
+        else:
+            return False
         
-    def MakeTables(self):
-        #
+   
+    def GetState(self,extent,fields):
+        return json.load(urllib2.urlopen("&".join([self.sourceurls[self.source],self.sumlevelurls['state'].format(istate=",".join(extent)),'get='+",".join(fields+['NAME'])])))
+
+
+#metadata
+#key (sumlevel, extent, source)
+#val1
+#val2
+
+#Datatables (source_sumlevel)
+#geoid (varchar25)
+#Val(name, numeric)
+
+
